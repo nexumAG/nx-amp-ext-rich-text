@@ -3,18 +3,34 @@ import {
   isToolEnabled,
   ProseMirrorTool,
   RichLanguage,
-  StandardToolOptions
+  StandardToolOptions,
 } from "@dc-extension-rich-text/common";
-import { AlignCenterTool, AlignJustifyTool, AlignLeftTool, AlignRightTool } from "./alignment/AlignmentTools";
+import {
+  AlignCenterTool,
+  AlignJustifyTool,
+  AlignLeftTool,
+  AlignRightTool,
+} from "./alignment/AlignmentTools";
 import { AnchorTool } from "./anchor";
 import { createInlineStylesTools } from "./inline_styles";
 import { createMarkdownParser } from "./markdown/MarkdownParser";
 import { createMarkdownSerializer } from "./markdown/MarkdownSerializer";
 import { createSchema } from "./schema/createSchema";
 import { SoftHyphenTool } from "./soft_hyphen";
-import { AddColumnTool, AddRowTool, CreateTableTool, DeleteColumnTool, DeleteRowTool, DeleteTableTool } from "./tables/TableTools";
+import {
+  AddColumnTool,
+  AddRowTool,
+  CreateTableTool,
+  DeleteColumnTool,
+  DeleteRowTool,
+  DeleteTableTool,
+} from "./tables/TableTools";
+import { TestTool } from "./test";
 
-export function createMarkdownTools(schema: any, options: StandardToolOptions): ProseMirrorTool[] {
+export function createMarkdownTools(
+  schema: any,
+  options: StandardToolOptions
+): ProseMirrorTool[] {
   let tools: ProseMirrorTool[] = [];
 
   if (isToolEnabled("inline_styles", options)) {
@@ -22,11 +38,20 @@ export function createMarkdownTools(schema: any, options: StandardToolOptions): 
   }
 
   if (isToolEnabled("anchor", options) && schema.nodes.anchor) {
-    tools.push(AnchorTool(schema, options.dialogs ? options.dialogs.getAnchor : undefined));
+    tools.push(
+      AnchorTool(
+        schema,
+        options.dialogs ? options.dialogs.getAnchor : undefined
+      )
+    );
   }
 
   if (isToolEnabled("soft_hyphen", options) && schema.nodes.soft_hyphen) {
     tools.push(SoftHyphenTool(schema));
+  }
+
+  if (isToolEnabled("test", options) && schema.nodes.test) {
+    tools.push(TestTool(schema));
   }
 
   // Alignment
@@ -83,8 +108,8 @@ export default class MarkdownLanguage implements RichLanguage {
     const schema = createSchema(isInlineStylesEnabled);
     const tools = [
       ...createStandardTools(schema, options),
-      ...createMarkdownTools(schema, options)
-    ]
+      ...createMarkdownTools(schema, options),
+    ];
 
     const serializer = createMarkdownSerializer();
     const parser = createMarkdownParser(schema);
