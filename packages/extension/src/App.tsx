@@ -8,7 +8,7 @@ import { RichTextDialogsContainer } from "./RichTextDialogs";
 interface AppState {
   connected: boolean;
   sdk?: SDK;
-  value?: string;
+  value?: any;
 }
 
 export default class App extends React.Component<{}, AppState> {
@@ -27,7 +27,15 @@ export default class App extends React.Component<{}, AppState> {
     const sdk: SDK = await init();
     sdk.frame.startAutoResizer();
 
-    const value: any = await sdk.field.getValue();
+    let value: any = await sdk.field.getValue();
+
+    if (!value){
+      value = {
+        values: [
+        ]
+      }
+    }
+
     this.setState({
       sdk,
       connected: true,
@@ -35,9 +43,19 @@ export default class App extends React.Component<{}, AppState> {
     });
   }
 
-  public handleValueChange(value: any): void {
-    if (this.state.connected && this.state.sdk) {
-      this.state.sdk.field.setValue(value);
+  public handleValueChange(locale: any, localeValue: any): void {
+    if(this.state.value){
+      this.setState(prevState => {
+        const value = {...prevState.value};
+        value.values[this.state.sdk ? this.state.sdk.locales.default.findIndex((x:any) => x === locale) : 0] = {
+          locale,
+          value: localeValue
+        };
+        return { value };
+      })
+      if (this.state.connected && this.state.sdk) {
+        this.state.sdk.field.setValue(this.state.value);
+      }
     }
   }
 
@@ -56,7 +74,7 @@ export default class App extends React.Component<{}, AppState> {
               withTheme(
                 <SdkContext.Provider value={{ sdk }}>
                 <RichTextDialogsContainer>
-                  <EditorRichTextField onChange={this.handleValueChange} value={value} schema={sdk.field.schema} />
+                  <EditorRichTextField onChange={this.handleValueChange} value={value} locales={sdk.locales} schema={sdk.field.schema} />
                 </RichTextDialogsContainer>
               </SdkContext.Provider>
               )

@@ -29,7 +29,8 @@ export const styles = {
 export interface EditorRichTextFieldProps extends WithStyles<typeof styles> {
   schema: any;
   value?: any;
-  onChange?: (value: any) => void;
+  locales?: any;
+  onChange?: (locale: any, localeValue: any) => void;
 }
 
 export interface EditorRichTextFieldParams {
@@ -66,7 +67,7 @@ export interface EditorRichTextFieldParams {
 const EditorRichTextField: React.SFC<EditorRichTextFieldProps> = (
   props: EditorRichTextFieldProps
 ) => {
-  const { schema, value: valueProp, onChange, classes } = props;
+  const { schema, value: valueProp, locales, onChange, classes } = props;
 
   const params: EditorRichTextFieldParams =
     schema && schema["ui:extension"] && schema["ui:extension"].params
@@ -119,28 +120,31 @@ const EditorRichTextField: React.SFC<EditorRichTextFieldProps> = (
     <div className={classes.root}>
       {params.styles ? (
         <style dangerouslySetInnerHTML={{ __html: params.styles }} />
-      ) : (
-        false
-      )}
+      ) : false}
       {params.stylesheet ? (
         <link rel="stylesheet" href={params.stylesheet} />
-      ) : (
-        false
-      )}
+      ) : false}
 
-      <RichTextEditor
-        languages={languages}
-        language={params.language}
-        editorViewOptions={editorViewOptions}
-        toolbarLayout={params.toolbar ? params.toolbar.layout : undefined}
-        disableToolbar={params.toolbar ? params.toolbar.disabled : undefined}
-        disableCodeView={params.codeView ? params.codeView.disabled : undefined}
-        readOnlyCodeView={
-          params.codeView ? params.codeView.readOnly : undefined
-        }
-        onChange={onChange}
-        value={valueProp}
-      />
+      {locales.available ? locales.default.map((locale: any) => {
+        return (
+          <RichTextEditor
+            key={locale}
+            languages={languages}
+            language={params.language}
+            editorViewOptions={editorViewOptions}
+            toolbarLayout={params.toolbar ? params.toolbar.layout : undefined}
+            disableToolbar={params.toolbar ? params.toolbar.disabled : undefined}
+            disableCodeView={params.codeView ? params.codeView.disabled : undefined}
+            readOnlyCodeView={
+              params.codeView ? params.codeView.readOnly : undefined
+            }
+            locale={locale}
+            onChange={onChange}
+            value={valueProp.values ? valueProp.values.find((value:any) => value.locale === locale).value : ''}
+          />
+        );
+      }): null }
+
     </div>
   );
 };
