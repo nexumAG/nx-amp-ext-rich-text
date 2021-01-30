@@ -1,6 +1,6 @@
 import React from "react";
 
-import { withStyles, WithStyles } from "@material-ui/core";
+import {AppBar, Box, Tab, Tabs, Typography, withStyles, WithStyles} from "@material-ui/core";
 
 import { ToolbarElement } from "../ProseMirrorToolbar";
 import { RichTextEditor } from "../RichTextEditor";
@@ -64,10 +64,42 @@ export interface EditorRichTextFieldParams {
   };
 }
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: any;
+  value: any;
+}
+
+// tslint:disable-next-line:typedef
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`tabpanel-${index}`}
+      aria-labelledby={`tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box p={3}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
 const EditorRichTextField: React.SFC<EditorRichTextFieldProps> = (
   props: EditorRichTextFieldProps
 ) => {
   const { schema, value: valueProp, locales, onChange, classes } = props;
+  const [tabsValue, setTabsValue] = React.useState(0);
+
+  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setTabsValue(newValue);
+  };
 
   const params: EditorRichTextFieldParams =
     schema && schema["ui:extension"] && schema["ui:extension"].params
@@ -125,26 +157,32 @@ const EditorRichTextField: React.SFC<EditorRichTextFieldProps> = (
         <link rel="stylesheet" href={params.stylesheet} />
       ) : false}
 
-      {locales.available ? locales.default.map((locale: any) => {
+      <Tabs value={tabsValue} onChange={handleChange} indicatorColor="primary" aria-label="tabs">
+        {locales.available ? locales.available.map((locale: any) => {
+          return(<Tab key={locale} label={locale.country}/>);
+        }) : null}
+      </Tabs>
+      {locales.default ? locales.default.map((locale: any, index: number) => {
         return (
-          <RichTextEditor
-            key={locale}
-            languages={languages}
-            language={params.language}
-            editorViewOptions={editorViewOptions}
-            toolbarLayout={params.toolbar ? params.toolbar.layout : undefined}
-            disableToolbar={params.toolbar ? params.toolbar.disabled : undefined}
-            disableCodeView={params.codeView ? params.codeView.disabled : undefined}
-            readOnlyCodeView={
-              params.codeView ? params.codeView.readOnly : undefined
-            }
-            locale={locale}
-            onChange={onChange}
-            value={valueProp.values ? valueProp.values.find((value:any) => value.locale === locale).value : ''}
-          />
+          <TabPanel key={locale} value={tabsValue} index={index}>
+            <RichTextEditor
+              key={locale}
+              languages={languages}
+              language={params.language}
+              editorViewOptions={editorViewOptions}
+              toolbarLayout={params.toolbar ? params.toolbar.layout : undefined}
+              disableToolbar={params.toolbar ? params.toolbar.disabled : undefined}
+              disableCodeView={params.codeView ? params.codeView.disabled : undefined}
+              readOnlyCodeView={
+                params.codeView ? params.codeView.readOnly : undefined
+              }
+              locale={locale}
+              onChange={onChange}
+              value={valueProp.values ? valueProp.values.find((value:any) => value.locale === locale).value : ''}
+            />
+          </TabPanel>
         );
-      }): null }
-
+      }) : null}
     </div>
   );
 };

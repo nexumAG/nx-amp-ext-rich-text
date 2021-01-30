@@ -27,14 +27,7 @@ export default class App extends React.Component<{}, AppState> {
     const sdk: SDK = await init();
     sdk.frame.startAutoResizer();
 
-    let value: any = await sdk.field.getValue();
-
-    if (!value){
-      value = {
-        values: [
-        ]
-      }
-    }
+    const value: any = await sdk.field.getValue();
 
     this.setState({
       sdk,
@@ -52,10 +45,11 @@ export default class App extends React.Component<{}, AppState> {
           value: localeValue
         };
         return { value };
-      })
-      if (this.state.connected && this.state.sdk) {
-        this.state.sdk.field.setValue(this.state.value);
-      }
+      }, () => {
+        if (this.state.connected && this.state.sdk) {
+          this.state.sdk.field.setValue(this.state.value);
+        }
+      });
     }
   }
 
