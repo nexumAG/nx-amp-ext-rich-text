@@ -1,6 +1,6 @@
 import React from "react";
 
-import {AppBar, Box, Tab, Tabs, Typography, withStyles, WithStyles} from "@material-ui/core";
+import {Box, Tab, Tabs, Typography, withStyles, WithStyles} from "@material-ui/core";
 
 import { ToolbarElement } from "../ProseMirrorToolbar";
 import { RichTextEditor } from "../RichTextEditor";
@@ -23,6 +23,15 @@ import { RichTextDialogsContext } from "../RichTextDialogs";
 export const styles = {
   root: {
     width: "100%"
+  },
+  title: {
+    padding: "7px 0",
+    minHeight: "20px",
+    color: "#666",
+    fontSize: "13px",
+    boxSizing: "border-box" as "border-box",
+    "-webkit-font-smoothing": "auto",
+    fontFamily: "roboto,sans-serif!important"
   }
 };
 
@@ -34,10 +43,14 @@ export interface EditorRichTextFieldProps extends WithStyles<typeof styles> {
 }
 
 export interface EditorRichTextFieldParams {
+  title?: string;
   language?: string;
 
   styles?: string;
   stylesheet?: string;
+
+  useClasses?: boolean;
+  classOverride?: { [originalName: string]: string };
 
   codeView?: {
     readOnly?: boolean;
@@ -111,6 +124,9 @@ const EditorRichTextField: React.SFC<EditorRichTextFieldProps> = (
 
   const toolOptions = React.useMemo<DynamicContentToolOptions>(() => {
     const settings = {
+      useClasses: params.useClasses,
+      classOverride: params.classOverride,
+
       dialogs,
       dynamicContent: {
         stagingEnvironment: sdk ? sdk.stagingEnvironment : undefined
@@ -155,6 +171,10 @@ const EditorRichTextField: React.SFC<EditorRichTextFieldProps> = (
       ) : false}
       {params.stylesheet ? (
         <link rel="stylesheet" href={params.stylesheet} />
+      ) : false}
+
+      {params.title ? (
+        <div className={classes.title}>{params.title}</div>
       ) : false}
 
       <Tabs value={tabsValue} onChange={handleChange} indicatorColor="primary" aria-label="tabs">

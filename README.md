@@ -15,7 +15,10 @@ This extension is designed to replace the built in rich text editor with additio
   * Headings
   * Bold text
   * Italic text
+  * Soft hyphens
   * Hyperlinks
+  * Anchors
+  * Text alignment
   * Bullet lists
   * Numeric lists
   * External images
@@ -31,15 +34,63 @@ This extension is designed to replace the built in rich text editor with additio
   * Cut/copy/paste content
   * Formatting when copying content from other tools
   * Keyboard shortcuts
-  * Undo / Redo
+  * Undo/Redo
 * Customizability
-  * Enable / disable tools
+  * Enable/disable tools
   * Change toolbar layout
   * Custom styles
 
-## Getting Started
+More details on the available features can be found on the [Features](FEATURES.md) page, whilst further information on how to configure and customise these features can be found in the [Configuration](#configuration) section.
+
+## How to install
+
+### Register Extension
+
+This extension needs to be [registered](https://amplience.com/docs/development/registeringextensions.html) against a Hub with in the Dynamic Content application (Developer -> Extensions), for it to load within that Hub.
+
+![Setup](media/setup.png)
+
+* Category: Content Field
+* Label: Rich Text
+* Name: dc-extension-rich-text _(needs to be unique with the Hub)_
+* URL: [https://rich-text.extensions.content.amplience.net](https://rich-text.extensions.content.amplience.net)
+* Description: Rich text editor _(can be left blank, if you wish)_
+* Initial height: 500
+
+Note:
+You can use our deployed version of this extension (builds from the "production" branch) -
+
+[https://rich-text.extensions.content.amplience.net](https://rich-text.extensions.content.amplience.net)
+
+_As this is an open source project you're welcome to host your own "fork" of this project. You can use any standard static hosting service (Netlify, Amplify, Vercel, etc.) if you wish. Further information can be found on the [Hosting](HOSTING.md) page._
+
+#### Permissions
+
+![Permissions](media/permissions.png)
+
+Sandbox permissions:
+- Allow same origin
+
+### Assign the extension to schema
 
 To use the rich text editor, you simply need to add a field to your content type schema that is configured to use the rich text editor extension.
+
+```json
+{
+    "type": "string",
+    "ui:extension": {
+        "url": "https://rich-text.extensions.content.amplience.net",
+
+        "params": {
+            "language": "markdown"
+        }
+    }
+}
+```
+
+Examples with the Rich Text extension included can also be found within the Extensions section of our [example schemas](https://amplience.com/docs/development/schema-examples/readme.html) in Dynamic Content.
+
+## Installation Params
 
 Using markdown output:
 
@@ -47,7 +98,7 @@ Using markdown output:
 {
     "type": "string",
     "ui:extension": {
-        "url": "https://amplience.github.io/dc-extension-rich-text/index.html",
+        "url": "https://rich-text.extensions.content.amplience.net",
 
         "params": {
             "language": "markdown"
@@ -70,7 +121,7 @@ Using JSON output:
 {
     "type": "array",
     "ui:extension": {
-        "url": "https://amplience.github.io/dc-extension-rich-text/index.html",
+        "url": "https://rich-text.extensions.content.amplience.net",
 
         "params": {
             "language": "json"
@@ -91,7 +142,7 @@ This will output an array of "blocks". Each block has a type and associated data
       "type": "dc-content-link",
       "data": {
          "id": "e9248f05-ec46-4558-8a18-b6b881597695",
-         "contentType": "http://qa-patrick.s3-website-eu-west-1.amazonaws.com/willow/content-types/banner.json",
+         "contentType": "https://github.com/amplience/dc-accelerators-content-types/blob/master/banner.json",
          "_meta": {
             "schema": "http://bigcontent.io/cms/schema/v1/core#/definitions/content-link"
          }
@@ -245,7 +296,7 @@ By default, an icon will be displayed for embedded content items. You can provid
 }
 ```
 
-"*" can be used in place of the schema id to apply the icon to all content types.
+"\*" can be used in place of the schema id to apply the icon to all content types.
 
 If you wish to display a card / visualization, provide a templated URL in the params:
 
@@ -336,16 +387,10 @@ This feature is blacklisted by default, you can enable it by passing in an empty
 
 ```
 
-## License
+## How to run locally
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+- `yarn install`
+- `yarn build`
+- `cd packages/extension`
+- `yarn start`
+- Head to `http://localhost:3000` for the locally running extension
